@@ -1,0 +1,7 @@
+INVOICE INV-C2 from Delta Repairs Ltd.
+
+From: delta
+To: charlie
+
+Cold-room repair (parts + labour)
+Total amount: 7 NEAR

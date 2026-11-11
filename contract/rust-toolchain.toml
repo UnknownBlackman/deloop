@@ -1,0 +1,4 @@
+# Pinned: Rust >= 1.87 enables wasm features (bulk-memory etc.) by default that the NEAR VM may reject.
+[toolchain]
+channel = "1.86.0"
+targets = ["wasm32-unknown-unknown"]

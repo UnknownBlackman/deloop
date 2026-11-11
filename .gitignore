@@ -1,0 +1,13 @@
+node_modules/
+contract/target/
+dist/
+web/dist/
+.env
+.env.*
+!.env.example
+.keys/
+*.log
+docs/
+# design-kit working files and screenshots
+web/.taste-skill/
+

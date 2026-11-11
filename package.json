@@ -1,0 +1,41 @@
+{
+  "name": "deloop",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build:contract": "node scripts/build-contract.mjs",
+    "test": "npm run test:unit && npm run test:sandbox",
+    "test:unit": "node --import tsx --test agent/test/*.test.ts web/test/*.test.ts",
+    "test:sandbox": "node scripts/run-sandbox-tests.mjs",
+    "test:sandbox:docker": "node scripts/run-sandbox-tests.mjs --docker",
+    "sim": "tsx scripts/sim.ts",
+    "setup": "tsx scripts/setup.ts",
+    "demo": "tsx scripts/demo.ts",
+    "status": "tsx scripts/status.ts",
+    "dev": "concurrently -k -n api,web -c blue,green \"tsx watch agent/src/server.ts\" \"vite web\"",
+    "replay:data": "tsx scripts/build-replay.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "concurrently": "^10.0.7",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.7"
+  },
+  "optionalDependencies": {
+    "near-workspaces": "^5.0.0"
+  },
+  "dependencies": {
+    "near-api-js": "^7.4.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}

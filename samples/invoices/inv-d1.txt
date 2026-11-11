@@ -1,0 +1,9 @@
+Alpha Trading
+Statement / Invoice INV-D1
+
+Supplier: alpha
+Billed to: delta
+
+Line 1  Warehouse rental, October     5.000 NEAR
+
+BALANCE DUE: 5.000 NEAR

@@ -1,0 +1,12 @@
+INVOICE
+
+Invoice No:   INV-A1
+Date:         2026-11-02
+From:         Bravo Supplies (bravo)
+Bill To:      Alpha Trading (alpha)
+
+Description                         Qty    Price
+Packaging crates                     20    0.5 NEAR
+
+Total Due: 10 NEAR
+Payment terms: 30 days

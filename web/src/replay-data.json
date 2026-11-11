@@ -1,0 +1,93 @@
+{
+  "invoices": [
+    {
+      "file": "inv-a1.txt",
+      "ref": "INV-A1",
+      "debtor": "alpha",
+      "creditor": "bravo",
+      "amountYocto": "10000000000000000000000000",
+      "status": "matched"
+    },
+    {
+      "file": "inv-b1.txt",
+      "ref": "INV-B1",
+      "debtor": "bravo",
+      "creditor": "charlie",
+      "amountYocto": "10000000000000000000000000",
+      "status": "matched"
+    },
+    {
+      "file": "inv-b2.txt",
+      "ref": "INV-B2",
+      "debtor": "bravo",
+      "creditor": "delta",
+      "amountYocto": "5000000000000000000000000",
+      "status": "matched"
+    },
+    {
+      "file": "inv-c1.txt",
+      "ref": "INV-C1",
+      "debtor": "charlie",
+      "creditor": "alpha",
+      "amountYocto": "10000000000000000000000000",
+      "status": "matched"
+    },
+    {
+      "file": "inv-c2.txt",
+      "ref": "INV-C2",
+      "debtor": "charlie",
+      "creditor": "delta",
+      "amountYocto": "7000000000000000000000000",
+      "status": "flagged",
+      "reason": "invoice says 7 NEAR, charlie's ledger says 5 NEAR"
+    }
+  ],
+  "unreadable": [],
+  "record": {
+    "deploy": {
+      "hash": "AADott2aPwUS5JCea3fYSXqabKdQXpdLM5RCvcZLajHE",
+      "url": "https://testnet.nearblocks.io/txns/AADott2aPwUS5JCea3fYSXqabKdQXpdLM5RCvcZLajHE",
+      "at": "2026-11-09T15:37:40.780Z",
+      "contract": "deloop.0xforge.testnet"
+    },
+    "confirm": {
+      "hash": "3dP973c7UEyXebzKwpthQcnWkhsnYT2GChABju6Yoeqy",
+      "url": "https://testnet.nearblocks.io/txns/3dP973c7UEyXebzKwpthQcnWkhsnYT2GChABju6Yoeqy",
+      "at": "2026-11-09T15:38:07.626Z",
+      "debt": 0,
+      "by": "alpha.0xforge.testnet"
+    },
+    "clear_cycle": {
+      "hash": "7WpxxuPaRzSvQnumJdgirN79pasAR4L4YwCQ3DmheKFX",
+      "url": "https://testnet.nearblocks.io/txns/7WpxxuPaRzSvQnumJdgirN79pasAR4L4YwCQ3DmheKFX",
+      "at": "2026-11-09T15:38:20.947Z",
+      "ring": [
+        "alpha",
+        "bravo",
+        "charlie"
+      ],
+      "amount_near": "10",
+      "debt_ids": [
+        0,
+        1,
+        3
+      ]
+    },
+    "pay_debt_2": {
+      "hash": "AfbLCscQ1VJrhA4AoHGBZ1wUUQTLUWpiraUtrTfQeGvU",
+      "url": "https://testnet.nearblocks.io/txns/AfbLCscQ1VJrhA4AoHGBZ1wUUQTLUWpiraUtrTfQeGvU",
+      "at": "2026-11-09T15:38:24.570Z",
+      "from": "bravo.0xforge.testnet",
+      "to": "delta.0xforge.testnet",
+      "amount_near": "5"
+    },
+    "pay_debt_4": {
+      "hash": "HVACGhPqSCdAUMHR2MGyRLvFUfzLdomxNFrYZma1rn2E",
+      "url": "https://testnet.nearblocks.io/txns/HVACGhPqSCdAUMHR2MGyRLvFUfzLdomxNFrYZma1rn2E",
+      "at": "2026-11-09T15:38:27.963Z",
+      "from": "delta.0xforge.testnet",
+      "to": "alpha.0xforge.testnet",
+      "amount_near": "5"
+    }
+  }
+}

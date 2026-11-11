@@ -1,0 +1,8 @@
+Delta Repairs Ltd.
+------------------
+INVOICE # INV-B2
+Payee:  delta
+Payer:  bravo
+
+Forklift service                      5 NEAR
+TOTAL                                 5 NEAR

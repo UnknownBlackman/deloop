@@ -1,0 +1,28 @@
+name: test
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - name: Install Rust 1.86 + wasm target (pinned in contract/rust-toolchain.toml)
+        run: rustup toolchain install 1.86.0 --profile minimal --target wasm32-unknown-unknown
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            contract/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('contract/Cargo.lock') }}
+      - run: npm ci
+      - name: Build contract to wasm
+        run: npm run build:contract
+      - name: Contract unit tests (Rust)
+        run: cargo test
+        working-directory: contract
+      - name: npm test (cycle finder + reader unit tests, then 5 sandbox integration tests)
+        run: npm test
+      - name: npm run sim (offline)
+        run: npm run sim

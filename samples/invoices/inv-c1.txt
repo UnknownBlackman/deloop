@@ -1,0 +1,5 @@
+invoice_ref = INV-C1
+seller      = alpha
+buyer       = charlie
+item        = raw cocoa, 2 t
+total       = NEAR 10

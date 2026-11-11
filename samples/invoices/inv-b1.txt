@@ -1,0 +1,9 @@
+=== CHARLIE LOGISTICS ===
+Tax invoice  |  Ref: INV-B1
+
+Issued by: charlie
+Customer:  bravo
+
+Freight, 4 pallets, Lagos -> Accra
+------------------------------------
+Amount due ........... 10.00 NEAR
