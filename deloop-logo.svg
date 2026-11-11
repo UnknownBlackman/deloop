@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1144 -787 4527 1037" width="4527" height="1037" role="img" aria-label="Deloop">
+  <style>
+    :root {
+      --ink: #475569;
+      --settled: #6D28D9;
+      --node-dot: #C4B5FD;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #E2E8F0;
+        --settled: #A78BFA;
+        --node-dot: #8B5CF6;
+      }
+    }
+    .debt {
+      fill: none; stroke: var(--c); stroke-width: 72; stroke-linecap: butt;
+      stroke-dasharray: 1 2; stroke-dashoffset: 0; opacity: 0;
+      animation: draw 0.3s cubic-bezier(.45, 0, .55, 1) var(--d) forwards,
+                 fade .25s ease-out 2.16s forwards;
+    }
+    .head {
+      fill: var(--c); opacity: 0; transform-box: fill-box; transform-origin: center;
+      animation: pop .22s cubic-bezier(.3, 1.6, .5, 1) var(--d) forwards,
+                 shrink .22s ease-in 1.54s forwards;
+    }
+    .node {
+      fill: var(--node-dot); stroke: var(--settled); stroke-width: 20;
+      transform-box: fill-box; transform-origin: center;
+      animation: popNode .28s cubic-bezier(.3, 1.6, .5, 1) var(--d) forwards,
+                 settle .3s ease-out var(--s) forwards;
+    }
+    .ring {
+      fill: none; stroke: var(--settled); stroke-width: 72;
+      stroke-dasharray: 1 2; stroke-dashoffset: 0;
+      animation: drawRing 0.62s cubic-bezier(.55, 0, .35, 1) 1.59s forwards;
+    }
+    .mark {
+      transform-box: fill-box; transform-origin: center;
+      animation: pulse .5s cubic-bezier(.3, 1.4, .5, 1) 2.21s;
+    }
+    .ch {
+      fill: var(--ink); opacity: 1; transform: translateY(0);
+      animation: rise .45s cubic-bezier(.2, .8, .2, 1) var(--d) forwards;
+    }
+    .ch.de { fill: var(--settled); }
+
+    @keyframes draw { from { stroke-dashoffset: 1; opacity: 1; } to { stroke-dashoffset: 0; opacity: 1; } }
+    @keyframes drawRing { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+    @keyframes fade { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes pop { 0% { opacity: 1; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
+    @keyframes popNode { 0% { opacity: 1; transform: scale(0); stroke: var(--ink); fill: #fff; } 100% { opacity: 1; transform: scale(1); stroke: var(--ink); fill: #fff; } }
+    @keyframes shrink { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0); } }
+    @keyframes settle {
+      from { transform: scale(1); stroke: var(--ink); fill: #fff; }
+      50% { transform: scale(1.25); }
+      to { transform: scale(1); stroke: var(--settled); fill: var(--node-dot); }
+    }
+    @keyframes pulse { 50% { transform: scale(1.05); } }
+    @keyframes rise { from { opacity: 0; transform: translateY(70px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .debt, .head, .node, .ring, .mark, .ch { animation: none !important; }
+      .debt, .head { opacity: 0 !important; }
+      .node { transform: none !important; stroke: var(--settled) !important; fill: var(--node-dot) !important; }
+      .ring { stroke-dashoffset: 0 !important; }
+      .ch { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+  <g class="mark">
+    <path class="debt" style="--c:#F97316; --d:0.15s" pathLength="1" d="M-783.7 -705.5 A372 372 0 0 1 -465.9 -632.1"/>
+    <path class="head" style="--c:#F97316; --d:0.41s" d="M-415.0 -582.1 L-432.8 -685.0 L-509.1 -587.3 Z"/>
+    <path class="debt" style="--c:#E11D48; --d:0.49s" pathLength="1" d="M-337.5 -426.7 A372 372 0 0 1 -410.9 -108.9"/>
+    <path class="head" style="--c:#E11D48; --d:0.75s" d="M-460.9 -58.0 L-358.0 -75.8 L-455.7 -152.1 Z"/>
+    <path class="debt" style="--c:#EAB308; --d:0.83s" pathLength="1" d="M-616.3 19.5 A372 372 0 0 1 -934.1 -53.9"/>
+    <path class="head" style="--c:#EAB308; --d:1.09s" d="M-985.0 -103.9 L-967.2 -1.0 L-890.9 -98.7 Z"/>
+    <path class="debt" style="--c:#7C3AED; --d:1.17s" pathLength="1" d="M-1062.5 -259.3 A372 372 0 0 1 -989.1 -577.1"/>
+    <path class="head" style="--c:#7C3AED; --d:1.43s" d="M-939.1 -628.0 L-1042.0 -610.2 L-944.3 -533.9 Z"/>
+    <path class="ring" pathLength="1" d="M-886.0 -665.2 A372 372 0 0 1 -514.0 -20.8 A372 372 0 0 1 -886.6 -664.8"/>
+    <circle class="node" style="--d:0.00s; --s:1.59s" cx="-886.0" cy="-665.2" r="60"/>
+    <circle class="node" style="--d:0.43s; --s:1.74s" cx="-377.8" cy="-529.0" r="60"/>
+    <circle class="node" style="--d:0.77s; --s:1.90s" cx="-514.0" cy="-20.8" r="60"/>
+    <circle class="node" style="--d:1.11s; --s:2.05s" cx="-1022.2" cy="-157.0" r="60"/>
+  </g>
+  <g class="word">
+    <path class="ch de" style="--d:1.94s" d="M270 14Q211 14 159.5 -15.5Q108 -45 77 -102Q46 -159 46 -240V-256Q46 -337 77 -394Q108 -451 159 -480.5Q210 -510 270 -510Q315 -510 345.5 -499.5Q376 -489 395 -473Q414 -457 424 -439H442V-700H568V0H444V-60H426Q409 -32 373.5 -9Q338 14 270 14ZM308 -96Q366 -96 405 -133.5Q444 -171 444 -243V-253Q444 -325 405.5 -362.5Q367 -400 308 -400Q250 -400 211 -362.5Q172 -325 172 -253V-243Q172 -171 211 -133.5Q250 -96 308 -96Z"/>
+    <path class="ch de" style="--d:2.00s" d="M934 14Q860 14 803.5 -17.5Q747 -49 715.5 -106.5Q684 -164 684 -242V-254Q684 -332 715 -389.5Q746 -447 802 -478.5Q858 -510 932 -510Q1005 -510 1059 -477.5Q1113 -445 1143 -387.5Q1173 -330 1173 -254V-211H812Q814 -160 850 -128Q886 -96 938 -96Q991 -96 1016 -119Q1041 -142 1054 -170L1157 -116Q1143 -90 1116.5 -59.5Q1090 -29 1046 -7.5Q1002 14 934 14ZM813 -305H1045Q1041 -348 1010.5 -374Q980 -400 931 -400Q880 -400 850 -374Q820 -348 813 -305Z"/>
+    <path class="ch" style="--d:2.06s" d="M1285 0V-700H1411V0Z"/>
+    <path class="ch" style="--d:2.12s" d="M1787 14Q1713 14 1654 -16Q1595 -46 1561 -103Q1527 -160 1527 -240V-256Q1527 -336 1561 -393Q1595 -450 1654 -480Q1713 -510 1787 -510Q1861 -510 1920 -480Q1979 -450 2013 -393Q2047 -336 2047 -256V-240Q2047 -160 2013 -103Q1979 -46 1920 -16Q1861 14 1787 14ZM1787 -98Q1845 -98 1883 -135.5Q1921 -173 1921 -243V-253Q1921 -323 1883.5 -360.5Q1846 -398 1787 -398Q1729 -398 1691 -360.5Q1653 -323 1653 -253V-243Q1653 -173 1691 -135.5Q1729 -98 1787 -98Z"/>
+    <path class="ch" style="--d:2.18s" d="M2399 14Q2325 14 2266 -16Q2207 -46 2173 -103Q2139 -160 2139 -240V-256Q2139 -336 2173 -393Q2207 -450 2266 -480Q2325 -510 2399 -510Q2473 -510 2532 -480Q2591 -450 2625 -393Q2659 -336 2659 -256V-240Q2659 -160 2625 -103Q2591 -46 2532 -16Q2473 14 2399 14ZM2399 -98Q2457 -98 2495 -135.5Q2533 -173 2533 -243V-253Q2533 -323 2495.5 -360.5Q2458 -398 2399 -398Q2341 -398 2303 -360.5Q2265 -323 2265 -253V-243Q2265 -173 2303 -135.5Q2341 -98 2399 -98Z"/>
+    <path class="ch" style="--d:2.24s" d="M2775 200V-496H2899V-436H2917Q2934 -465 2970 -487.5Q3006 -510 3073 -510Q3133 -510 3184 -480.5Q3235 -451 3266 -394Q3297 -337 3297 -256V-240Q3297 -159 3266 -102Q3235 -45 3184 -15.5Q3133 14 3073 14Q3028 14 2997.5 3.5Q2967 -7 2948.5 -23.5Q2930 -40 2919 -57H2901V200ZM3035 -96Q3094 -96 3132.5 -133.5Q3171 -171 3171 -243V-253Q3171 -325 3132 -362.5Q3093 -400 3035 -400Q2977 -400 2938 -362.5Q2899 -325 2899 -253V-243Q2899 -171 2938 -133.5Q2977 -96 3035 -96Z"/>
+  </g>
+</svg>

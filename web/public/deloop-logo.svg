@@ -1,11 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1144 -787 4527 1037" role="img" aria-label="Deloop">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1144 -787 4527 1037" width="4527" height="1037" role="img" aria-label="Deloop">
   <style>
     :root {
       --ink: #475569;
       --settled: #6D28D9;
       --node-dot: #C4B5FD;
     }
-    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #E2E8F0;
+        --settled: #A78BFA;
+        --node-dot: #8B5CF6;
+      }
+    }
     .debt {
       fill: none; stroke: var(--c); stroke-width: 72; stroke-linecap: butt;
       stroke-dasharray: 1 2; stroke-dashoffset: 0; opacity: 0;
