@@ -36,6 +36,8 @@ export type Cleared = Cycle & Tx;
 
 export interface Backend {
   mode: "live" | "replay";
+  /** reads a deployment but cannot sign (the recorded live run, without the local API) */
+  readOnly?: boolean;
   state(): Promise<State>;
   runAgent(): Promise<AgentRun>;
   confirm(as: string, id: number): Promise<Tx>;
@@ -59,6 +61,66 @@ export const live: Backend = {
   confirm: (as, id) => api<Tx>("/api/confirm", { as, id }),
   pay: (as, id) => api<Tx>("/api/pay", { as, id }),
   clear: (as) => api<Cleared[]>("/api/clear", { as }),
+};
+
+// ---------------------------------------------------------------- chain (read-only)
+// Live testnet without the local API: the recorded run's contract, read straight from NEAR testnet's public RPC
+// (view calls need no account or key). It is the real on-chain record; nothing can be signed from here.
+const RPC_URL = "https://test.rpc.fastnear.com";
+const EXPLORER = "https://testnet.nearblocks.io";
+const nameOf = (accountId: string) => accountId.split(".")[0];
+
+async function chainView<T>(contract: string, method: string): Promise<T> {
+  const res = await fetch(RPC_URL, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: "deloop", method: "query", params: { request_type: "call_function", finality: "final", account_id: contract, method_name: method, args_base64: btoa("{}") } }),
+  });
+  const out = await res.json();
+  if (out.error || out.result?.error) throw new Error(`Could not read ${contract} from NEAR testnet`);
+  return JSON.parse(new TextDecoder().decode(new Uint8Array(out.result.result))) as T;
+}
+
+const readOnly = () => Promise.reject(new Error("This is the recorded live run, read from NEAR testnet: there is nothing to sign here. Run Deloop locally to sign your own."));
+
+export const chain: Backend = {
+  mode: "live",
+  readOnly: true,
+  async state() {
+    type ChainDebt = { id: number; debtor: string; creditor: string; amount: string; outstanding: string; invoice_ref: string; status: Status };
+    const [debts, totals] = await Promise.all([
+      chainView<ChainDebt[]>(contractId, "get_debts"),
+      chainView<{ outstanding_sum: string; count: number }>(contractId, "get_totals"),
+    ]);
+    // the same reading the local API gives (agent/src/server.ts)
+    const { clearings, remaining } = planClearings(
+      debts.filter((d) => d.status === "Confirmed" && BigInt(d.outstanding) > 0n).map((d) => ({ id: d.id, debtor: d.debtor, creditor: d.creditor, outstanding: BigInt(d.outstanding) })),
+    );
+    const c = rec.clear_cycle as { ring?: string[]; amount_near?: string; debt_ids?: number[]; hash: string; url: string } | undefined;
+    return {
+      contractId,
+      contractUrl: `${EXPLORER}/address/${contractId}`,
+      reader: "regex",
+      totals: { outstandingNear: yoctoToNear(BigInt(totals.outstanding_sum)), count: totals.count },
+      afterClearing: {
+        paymentsNeeded: remaining.length,
+        totalNear: yoctoToNear(remaining.reduce((s, d) => s + d.outstanding, 0n)),
+        cycles: clearings.map((k) => ({ ring: k.ring.map(nameOf), amountNear: yoctoToNear(k.amount), debtIds: k.debtIds })),
+      },
+      lastClear: c ? { ring: (c.ring ?? []).map(nameOf), amountNear: String(c.amount_near), debtIds: c.debt_ids ?? [], hash: c.hash, url: c.url } : null,
+      debts: debts.map((d) => ({
+        ...d,
+        debtorName: nameOf(d.debtor),
+        creditorName: nameOf(d.creditor),
+        amountNear: yoctoToNear(BigInt(d.amount)),
+        outstandingNear: yoctoToNear(BigInt(d.outstanding)),
+      })),
+    };
+  },
+  runAgent: readOnly,
+  confirm: readOnly,
+  pay: readOnly,
+  clear: readOnly,
 };
 
 /** The live backend is usable when the API answers and its contract exists. */

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { flaggedSamples, live, liveAvailable, replay, type AgentRun, type Backend, type Cleared, type State } from "./backend";
+import { chain, flaggedSamples, live, liveAvailable, replay, type AgentRun, type Backend, type Cleared, type State } from "./backend";
 
 /** The four demo businesses. On testnet they are alpha, bravo, charlie and delta under the master account. */
 const BIZ: Record<string, { name: string; short: string; color: string; ink: string }> = {
@@ -47,13 +47,39 @@ export function App() {
     setBe(replay);
     liveAvailable().then((ok) => {
       setLiveOk(ok);
-      if (ok && wantLive) setBe(live);
+      if (wantLive) setBe(ok ? live : chain);
     });
   }, []);
   const refresh = useCallback(() => (be ? be.state().then(setState).catch((e) => setError(e.message)) : Promise.resolve()), [be]);
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  // the address says which view this is, so ?mode=live opens the live view directly
+  const view = be?.mode === "live" ? "live" : "replay";
+  useEffect(() => {
+    if (!be) return;
+    const url = new URL(location.href);
+    if (url.searchParams.get("mode") === view) return;
+    url.searchParams.set("mode", view);
+    history.replaceState(null, "", url);
+  }, [view, be]);
+
+  function showReplay() {
+    switchTo(replay);
+  }
+  // Live testnet: with the local API (a deployment of your own, from the README steps) the live flow on it;
+  // without, the recorded live run read from NEAR testnet, settled and read-only. The API is checked again on
+  // every press, so a reader who has just started npm run dev goes straight to their own run.
+  function showLive() {
+    if (liveOk) return switchTo(live);
+    switchTo(chain);
+    liveAvailable().then((ok) => {
+      if (!ok) return;
+      setLiveOk(true);
+      setBe((cur) => (cur === chain ? live : cur));
+    });
+  }
 
   function switchTo(next: Backend) {
     if (next === be) return;
@@ -169,8 +195,10 @@ export function App() {
             <img src="/deloop-logo.svg" alt="Deloop" width="128" height="29" />
           </a>
           <div className="mode" role="group" aria-label="Mode">
-            <button type="button" aria-pressed={be?.mode === "replay"} onClick={() => switchTo(replay)}>Replay</button>
-            <button type="button" aria-pressed={be?.mode === "live"} disabled={!liveOk} title={liveOk ? "Sign real transactions on NEAR testnet" : "Live mode needs the local API (npm run dev) and a deployed contract"} onClick={() => switchTo(live)}><i aria-hidden="true" />Live testnet</button>
+            <button type="button" aria-pressed={view === "replay"} onClick={showReplay}>Replay</button>
+            <button type="button" aria-pressed={view === "live"}
+              title={liveOk ? "Sign real transactions on NEAR testnet, on your own deployment" : "The recorded live run, read from NEAR testnet"}
+              onClick={showLive}><i aria-hidden="true" />Live testnet</button>
           </div>
           <nav className="acting" aria-label="Acting as">
             <span className="acting__label">Acting as</span>
@@ -191,7 +219,7 @@ export function App() {
         <section className="glance">
           <div className="wrap glance__grid">
             <div>
-              <p className="note">{be?.mode === "replay" ? "Playing as" : "Signed in as"} {me.name} <span className="mono">({as} on testnet)</span></p>
+              <p className="note">{be?.mode === "replay" ? "Playing as" : be?.readOnly ? "Viewing as" : "Signed in as"} {me.name} <span className="mono">({as} on testnet)</span></p>
               <h1>The <span className="pen">ledger</span></h1>
               <p className="glance__lead">
                 {s ? <>
@@ -204,7 +232,7 @@ export function App() {
               <div><dt>Outstanding, confirmed</dt><dd>{s ? outstanding : "…"}</dd></div>
               <div><dt>Cleared by loops, no transfer</dt><dd>{s ? `− ${clearable}` : "…"}</dd></div>
               <div className="tally__total"><dt>Left to pay</dt><dd>{s ? `${after} NEAR` : "…"}</dd></div>
-              <p className="tally__foot">{s ? `${s.totals.count} confirmed debts · ${s.afterClearing.paymentsNeeded} payments after clearing` : ""}</p>
+              <p className="tally__foot">{s ? `${s.totals.count} confirmed debt${s.totals.count === 1 ? "" : "s"} · ${s.afterClearing.paymentsNeeded} payment${s.afterClearing.paymentsNeeded === 1 ? "" : "s"} after clearing` : ""}</p>
             </dl>
           </div>
         </section>
@@ -241,13 +269,7 @@ export function App() {
                 </div>
                 <div className="own-run__col">
                   <h3>Run a live testnet run of your own</h3>
-                  <ol className="own-run__steps">
-                    <li>Get a NEAR <b>testnet</b> account with about 25 testnet NEAR, free from the <a href="https://near-faucet.io" target="_blank" rel="noreferrer">testnet faucet</a>. Never use mainnet funds.</li>
-                    <li>In the Deloop repository run <code>npm install</code>, then <code>cp .env.example .env</code> and set <code>NEAR_ACCOUNT_ID</code> and <code>NEAR_PRIVATE_KEY</code>.</li>
-                    <li><code>npm run setup</code> creates the four test businesses under your account and deploys the contract.</li>
-                    <li><code>npm run demo</code> deploys a fresh contract and seeds the sample invoices, unconfirmed.</li>
-                    <li><code>npm run dev</code>, open the dashboard and press <b>Live testnet</b>. Every button now signs a real transaction.</li>
-                  </ol>
+                  <LiveSteps />
                 </div>
               </div>
             </div>
@@ -469,6 +491,19 @@ export function App() {
         </div>
       </footer>
     </>
+  );
+}
+
+/** How to run Deloop live on testnet, from a fresh machine to the dashboard's Live testnet button. */
+function LiveSteps() {
+  return (
+    <ol className="own-run__steps">
+      <li>Get a NEAR <b>testnet</b> account with about 25 testnet NEAR, free from the <a href="https://near-faucet.io" target="_blank" rel="noreferrer">testnet faucet</a>. Never use mainnet funds.</li>
+      <li>Clone the Deloop repository and run <code>npm install</code>, then <code>cp .env.example .env</code> and set <code>NEAR_ACCOUNT_ID</code> and <code>NEAR_PRIVATE_KEY</code>.</li>
+      <li><code>npm run setup</code> creates the four test businesses under your account and deploys the contract.</li>
+      <li><code>npm run demo</code> deploys a fresh contract and seeds the sample invoices, unconfirmed.</li>
+      <li><code>npm run dev</code>, open the dashboard it serves and press <b>Live testnet</b>. Every button now signs a real transaction.</li>
+    </ol>
   );
 }
 

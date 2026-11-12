@@ -14,3 +14,7 @@ web/.taste-skill/
 
 # nearcore sandbox binaries for the contract tests
 .sandbox/
+
+# demo video: rendered frames and outputs (sources stay in git)
+video/
+brand/
