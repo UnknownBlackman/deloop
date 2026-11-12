@@ -129,3 +129,14 @@ export function logTx(label: string, hash: string, extra: Record<string, unknown
   log[label] = { hash, url: txUrl(hash), at: new Date().toISOString(), ...extra };
   writeFileSync(DEPLOY_LOG, JSON.stringify(log, null, 2) + "\n");
 }
+
+/** The last clear_cycle recorded for the current deployment, or null. The contract keeps no history of
+ *  loops, so the dashboard reads it here to show a cleared loop after a reload. Only a clearing logged
+ *  after this contract's own deploy counts, so an older run never shows against a newer deployment. */
+export function lastClearing(contract: string): { ring: string[]; amountNear: string; debtIds: number[]; hash: string; url: string } | null {
+  if (!existsSync(DEPLOY_LOG)) return null;
+  const log = JSON.parse(readFileSync(DEPLOY_LOG, "utf8"));
+  const dep = log.deploy, c = log.clear_cycle;
+  if (!dep || !c || dep.contract !== contract || !(c.at >= dep.at)) return null;
+  return { ring: (c.ring ?? []).map(nameOf), amountNear: String(c.amount_near), debtIds: c.debt_ids ?? [], hash: c.hash, url: c.url };
+}

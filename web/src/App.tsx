@@ -86,18 +86,24 @@ export function App() {
   const outstanding = s?.totals.outstandingNear ?? "0";
   const after = s?.afterClearing.totalNear ?? "0";
   const clearable = s ? subNear(outstanding, after) : "0";
-  const loops = cleared ?? s?.afterClearing.cycles ?? [];
+  // live, after a reload: no loop is ready and this session cleared none, but the deployment has a recorded
+  // clearing; show it cleared (with its real transaction), since the contract keeps no history of loops
+  const recorded = be?.mode === "live" && !cleared && !s?.afterClearing.cycles.length && s?.lastClear ? [s.lastClear as Cleared] : null;
+  const done = cleared ?? recorded;
+  const loops = done ?? s?.afterClearing.cycles ?? [];
   // The flow is one job per step, the same live and in replay:
   //   02 every proposed debt is confirmed -> 03 the loop clears (only then) -> 04 the leftover is paid (only then).
   // Clearing waits for every answer so the loop is chosen over the whole ledger, not a part of it.
   const proposed = s?.debts.filter((d) => d.status === "Proposed") ?? [];
   const proposedLeft = proposed.length;
-  const cyclesReady = cleared ? [] : s?.afterClearing.cycles ?? [];
+  const cyclesReady = done ? [] : s?.afterClearing.cycles ?? [];
   const canClear = !!s && proposedLeft === 0 && cyclesReady.length > 0;
   const inLoop = new Set(cyclesReady.flatMap((c) => c.debtIds));
   const payOpen = !!s && s.debts.length > 0 && proposedLeft === 0 && cyclesReady.length === 0;
   const leftovers = payOpen ? s!.debts.filter((d) => d.status === "Confirmed") : [];
   const allSettled = !!s && s.debts.length > 0 && s.debts.every((d) => d.status === "Settled");
+  // live, but the contract's run is already over: say so, and show how to start a live run of your own
+  const liveFinished = be?.mode === "live" && allSettled;
   // invoices the reconciler flagged never become debts; show them in step 02 so players see why
   const held = (agent?.invoices ?? (s?.debts.length ? flaggedSamples() : [])).filter((i) => i.status === "flagged");
   const loopEmpty = !s || s.debts.length === 0
@@ -106,7 +112,7 @@ export function App() {
       ? `${proposedLeft} debt${proposedLeft > 1 ? "s are" : " is"} still waiting to be confirmed in step 02. The loop shows here once every debt is answered.`
       : "No loop left to clear. What remains is paid in step 04.";
   const totalNear = s ? fmtY(s.debts.reduce((t, d) => t + toY(d.amountNear), 0n)) : "0";
-  const clearedNear = cleared ? fmtY(cleared.reduce((t, c) => t + toY(c.amountNear) * BigInt(c.debtIds.length), 0n)) : null;
+  const clearedNear = done ? fmtY(done.reduce((t, c) => t + toY(c.amountNear) * BigInt(c.debtIds.length), 0n)) : null;
 
   // the actions, shared by the step buttons and the Next bar; each signs as the business that must act
   const runAgent = () => act("Running the agent", () => be!.runAgent(), setAgent);
@@ -134,7 +140,9 @@ export function App() {
           : l
             ? { step: 4, target: `pay-${l.id}`, text: `${biz(l.debtorName).short} pays ${biz(l.creditorName).short} the ${l.outstandingNear} NEAR left over`, label: `Pay as ${biz(l.debtorName).short}`, run: () => pay(l.debtorName, l.id, l.outstandingNear, l.creditorName) }
             : allSettled
-              ? { step: 4, target: "s4", text: "every debt is settled", done: true }
+              ? liveFinished
+                ? { step: 4, target: "own-run", text: "this live testnet run is already finished. Play the replay, or start a live run of your own", done: true }
+                : { step: 4, target: "s4", text: "every debt is settled", done: true }
               : null;
 
   // The Next bar's button: scroll to where the action happens, mark it, then act there.
@@ -205,8 +213,43 @@ export function App() {
           <div className="wrap">
             <div className="replay-bar">
               <span className="stamp stamp--ink">Replay</span>
-              <p>No transaction is sent and no wallet is needed. Each step runs the contract’s own checks in your browser, and where a step matches the recorded 9 November testnet run, it links to that real transaction.</p>
+              <p>Experience a replay of the 9 November testnet run. No transaction is sent and no wallet is needed. Where a step matches the recorded testnet run, it links to that real transaction.</p>
               <button type="button" className="btn btn--ink btn--sm" onClick={startOver} disabled={!!busy}>Start over</button>
+            </div>
+          </div>
+        )}
+
+        {liveFinished && (
+          <div className="wrap" id="own-run">
+            <div className="own-run">
+              <div className="own-run__head">
+                <span className="stamp stamp--ink">Live · finished</span>
+                <div>
+                  <h2 className="own-run__title">This live run is <span className="pen">already settled</span></h2>
+                  <p>
+                    You are looking at Deloop&rsquo;s real contract on NEAR testnet,{" "}
+                    <a className="mono" href={s?.contractUrl} target="_blank" rel="noreferrer">{s?.contractId}</a>.
+                    Its debts were confirmed, cleared and paid, so there is nothing left to sign. Every row below is the on-chain record.
+                  </p>
+                </div>
+              </div>
+              <div className="own-run__grid">
+                <div className="own-run__col">
+                  <h3>Play it now, no setup</h3>
+                  <p>The replay walks the same four steps in your browser, with the contract&rsquo;s own rules. Nothing is sent.</p>
+                  <button type="button" className="btn btn--primary" onClick={() => switchTo(replay)}>Play the replay</button>
+                </div>
+                <div className="own-run__col">
+                  <h3>Run a live testnet run of your own</h3>
+                  <ol className="own-run__steps">
+                    <li>Get a NEAR <b>testnet</b> account with about 25 testnet NEAR, free from the <a href="https://near-faucet.io" target="_blank" rel="noreferrer">testnet faucet</a>. Never use mainnet funds.</li>
+                    <li>In the Deloop repository run <code>npm install</code>, then <code>cp .env.example .env</code> and set <code>NEAR_ACCOUNT_ID</code> and <code>NEAR_PRIVATE_KEY</code>.</li>
+                    <li><code>npm run setup</code> creates the four test businesses under your account and deploys the contract.</li>
+                    <li><code>npm run demo</code> deploys a fresh contract and seeds the sample invoices, unconfirmed.</li>
+                    <li><code>npm run dev</code>, open the dashboard and press <b>Live testnet</b>. Every button now signs a real transaction.</li>
+                  </ol>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -236,7 +279,9 @@ export function App() {
               </button>
             </div>
             <div className="sheet">
-              {!agent && <p className="empty">Run the agent to read <span className="mono">samples/invoices</span>.</p>}
+              {!agent && <p className="empty">{s?.debts.length
+                ? <>The agent already ran for this contract. Its debts are in step 02{liveFinished ? ", all settled" : ""}.</>
+                : <>Run the agent to read <span className="mono">samples/invoices</span>.</>}</p>}
               {agent && (
                 <table>
                   <thead><tr><th>Invoice</th><th>Owes</th><th>To</th><th className="r">Amount</th><th>Result</th></tr></thead>
@@ -343,11 +388,11 @@ export function App() {
               {loops.length === 0 && <p className="empty empty--band">{loopEmpty}</p>}
               {loops.map((c, i) => (
                 <div key={i} className="loop">
-                  <Ring keys={c.ring} amount={c.amountNear} phase={cleared ? "done" : busy === "Clearing the loop" ? "running" : "ready"} />
+                  <Ring keys={c.ring} amount={c.amountNear} phase={done ? "done" : busy === "Clearing the loop" ? "running" : "ready"} />
                   <div className="loop__text">
                     <p className="loop__names">{c.ring.map((k) => biz(k).short).join(" → ")} → {biz(c.ring[0]).short}</p>
                     <p><span className="mono">{c.amountNear} NEAR</span> off each of {c.debtIds.length} debts <span className="mono">[{c.debtIds.join(", ")}]</span></p>
-                    {cleared
+                    {done
                       ? <p><span className="stamp stamp--light">Cleared</span> {(c as Cleared).url && <a href={(c as Cleared).url} target="_blank" rel="noreferrer" className="mono">{be?.mode === "live" ? "tx" : "recorded tx"} {(c as Cleared).hash?.slice(0, 10)}…</a>}</p>
                       : <p className="note note--light">{canClear ? "Ready to clear" : `Waits for ${proposedLeft} more confirmation${proposedLeft > 1 ? "s" : ""} in step 02`}</p>}
                   </div>
@@ -407,10 +452,12 @@ export function App() {
           <div className="wrap nextbar__row">
             <span className="num">{String(next.step).padStart(2, "0")}</span>
             <p><span className="pen">{next.done ? "Done" : "Next"}</span> {next.text.charAt(0).toUpperCase() + next.text.slice(1)}.</p>
-            <a className="nextbar__jump" href={`#s${next.step}`}>Show step</a>
+            <a className="nextbar__jump" href={liveFinished ? "#own-run" : `#s${next.step}`}>{liveFinished ? "How to run your own" : "Show step"}</a>
             {next.run
               ? <button type="button" className="btn btn--primary btn--sm" disabled={!!busy || !be || going} onClick={() => goAndRun(next)}>{busy || going ? "Working…" : next.label}</button>
-              : be?.mode === "replay" && <button type="button" className="btn btn--ink btn--sm" disabled={!!busy} onClick={startOver}>Play again</button>}
+              : liveFinished
+                ? <button type="button" className="btn btn--light btn--sm" disabled={!!busy} onClick={() => switchTo(replay)}>Play the replay</button>
+                : be?.mode === "replay" && <button type="button" className="btn btn--ink btn--sm" disabled={!!busy} onClick={startOver}>Play again</button>}
           </div>
         </aside>
       )}

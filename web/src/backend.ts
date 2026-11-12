@@ -25,6 +25,8 @@ export type State = {
   totals: { outstandingNear: string; count: number };
   afterClearing: { paymentsNeeded: number; totalNear: string; cycles: Cycle[] };
   debts: Debt[];
+  /** live only: the last loop cleared on this deployment, from deployments/testnet.json */
+  lastClear?: (Cycle & { hash?: string; url?: string }) | null;
 };
 export type InvoiceRow = { file: string; ref: string; debtor: string; creditor: string; amountNear: string; status: "matched" | "flagged"; reason?: string };
 export type AgentRun = { reader: string; invoices: InvoiceRow[]; unreadable: { file: string; error: string }[] };

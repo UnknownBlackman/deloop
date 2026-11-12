@@ -251,3 +251,19 @@ tr.is-flash td { animation: row-flash 1.8s ease-out; }
 @keyframes row-flash { 0%, 35% { background: #ede5fb; box-shadow: inset 0 0 0 9999px rgb(109 40 217 / .06); } 100% { background: transparent; } }
 @keyframes card-flash { 0%, 35% { box-shadow: 8px 8px 0 var(--violet), 0 0 0 4px rgb(109 40 217 / .25); } 100% { box-shadow: 8px 8px 0 var(--ink); } }
 @media (prefers-reduced-motion: reduce) { tr.is-flash td, .pay.is-flash { animation: none; } tr.is-flash td { background: #ede5fb; } }
+
+/* ---------- live, but the run is already finished: say so, and how to run your own ---------- */
+.own-run { margin-top: 24px; padding: 28px; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 14px; box-shadow: 8px 8px 0 var(--ink); display: grid; gap: 28px; scroll-margin-top: 104px; }
+#own-run { scroll-margin-top: 104px; }
+.own-run__head { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+.own-run__head > div { flex: 1 1 420px; display: grid; gap: 10px; }
+.own-run__title { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.02; }
+.own-run__grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 32px; border-top: 1px solid var(--line); padding-top: 24px; }
+.own-run__col { display: grid; gap: 12px; align-content: start; }
+.own-run__col h3 { margin: 0; font: 600 20px/1.2 var(--display); letter-spacing: -0.02em; }
+.own-run__col .btn { justify-self: start; }
+.own-run__steps { margin: 0; padding-left: 0; list-style: none; counter-reset: own; display: grid; gap: 12px; }
+.own-run__steps li { counter-increment: own; position: relative; padding-left: 46px; line-height: 1.6; }
+.own-run__steps li::before { content: counter(own, decimal-leading-zero); position: absolute; left: 0; top: 1px; width: 34px; font: 500 13px/1 var(--mono); color: var(--violet); border: 1.5px solid currentColor; border-radius: 99px; padding: 5px 0; text-align: center; }
+.own-run code { font: 500 14px var(--mono); background: #f1eefb; color: var(--violet-deep); padding: 2px 6px; border-radius: 5px; white-space: nowrap; }
+@media (max-width: 1023px) { .own-run__grid { grid-template-columns: minmax(0, 1fr); } }

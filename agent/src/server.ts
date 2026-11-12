@@ -6,7 +6,7 @@ import { yoctoToNear } from "./amount.ts";
 import { planClearings } from "./cycles.ts";
 import { llmEnabled } from "./llm.ts";
 import { proposeMatched, runAgent, runClearing } from "./flow.ts";
-import { accountUrl, business, businessId, call, contractId, getDebts, getTotals, nameOf, txUrl } from "./near.ts";
+import { accountUrl, business, businessId, call, contractId, getDebts, getTotals, lastClearing, logTx, nameOf, txUrl } from "./near.ts";
 
 const PORT = Number(process.env.API_PORT ?? 8787);
 
@@ -28,6 +28,8 @@ async function state() {
       totalNear: yoctoToNear(remaining.reduce((s, d) => s + d.outstanding, 0n)),
       cycles: clearings.map((c) => ({ ring: c.ring.map(nameOf), amountNear: yoctoToNear(c.amount), debtIds: c.debtIds })),
     },
+    // the last loop cleared on this deployment (from deployments/testnet.json), so a reload still shows it
+    lastClear: lastClearing(contractId()),
     debts: debts.map((d) => ({
       ...d,
       debtorName: nameOf(d.debtor),
@@ -71,6 +73,8 @@ const routes: Record<string, (body: Record<string, unknown>) => Promise<unknown>
 
   "POST /api/clear": async (b) => {
     const done = await runClearing(businessId(actingAs(b)));
+    // record it like the demo script does, so the dashboard can show this loop again after a reload
+    for (const c of done) logTx("clear_cycle", c.tx.hash, { ring: c.ring, amount_near: c.amount, debt_ids: c.debtIds });
     return done.map((c) => ({ ring: c.ring, amountNear: c.amount, debtIds: c.debtIds, hash: c.tx.hash, url: c.tx.url }));
   },
 
