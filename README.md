@@ -247,4 +247,4 @@ Deloop's mathematical clearing logic works regardless of what asset is being cle
 
 ## License
 [MIT](LICENSE)
-Also built by this team - [INPay](vercel-link-tba) [repo link](https://github.com/UnknownBlackman/inpay)
+Also built by this team - [INPay](https://inpay-na7v.onrender.com/) [repo link](https://github.com/UnknownBlackman/inpay)

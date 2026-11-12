@@ -11,3 +11,6 @@ docs/
 # design-kit working files and screenshots
 web/.taste-skill/
 
+
+# nearcore sandbox binaries for the contract tests
+.sandbox/

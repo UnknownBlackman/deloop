@@ -1,2 +1,7 @@
 [resolver]
 incompatible-rust-versions = "fallback"
+
+# near-sdk 5.2x compiles its host bindings only under cfg(near) (cargo-near sets it). Without it the wasm
+# gets near-sdk's local fallbacks: panics trap without a message (no panic_utf8), hashes run in wasm.
+[target.wasm32-unknown-unknown]
+rustflags = ["--cfg", "near"]

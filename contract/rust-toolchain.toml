@@ -1,4 +1,5 @@
-# Pinned: Rust >= 1.87 enables wasm features (bulk-memory etc.) by default that the NEAR VM may reject.
+# Pinned: Rust >= 1.87 enables bulk-memory by default for wasm32. The sandbox tests run on nearcore 2.14.1,
+# the version NEAR testnet runs (scripts/run-sandbox-tests.mjs), so the tested wasm is what testnet loads.
 [toolchain]
 channel = "1.86.0"
 targets = ["wasm32-unknown-unknown"]
