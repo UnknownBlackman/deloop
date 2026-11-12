@@ -12,6 +12,13 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="https://deloop-three.vercel.app/"><strong>Live App</strong></a> &nbsp;&bull;&nbsp;
+  <a href="https://deloop-three.vercel.app/dashboard?mode=replay"><strong>Interactive Replay</strong></a> &nbsp;&bull;&nbsp;
+  <a href="https://testnet.nearblocks.io/address/deloop.0xforge.testnet"><strong>NEAR Testnet Contract</strong></a> &nbsp;&bull;&nbsp;
+  <a href="DELOOP-CASE.md"><strong>Economic Case</strong></a>
+</p>
+
 
 **Deloop finds where your debts cancel out.**
 
@@ -39,9 +46,16 @@ Built for SMEs, trade networks, and supplier groups.
 
 ## Quickstart
 
-You can try Deloop instantly on your laptop without setting up wallets or spending a single token, or deploy it live to NEAR testnet.
+You can test Deloop directly on the live web deployment, run the offline simulator locally in 10 seconds, or deploy and run the live agent on NEAR testnet.
 
-### Option 1: Try it in 10 seconds (Offline Simulator)
+### Option 1: Try the Live Web App (Zero Setup)
+
+Visit [deloop-three.vercel.app](https://deloop-three.vercel.app/) to explore the live application.
+* **Interactive Replay Mode:** Open [deloop-three.vercel.app/dashboard?mode=replay](https://deloop-three.vercel.app/dashboard?mode=replay) to walk through all four stages (invoice reconciliation, non-custodial debt confirmation, circular ring clearing, and leftover settlement) directly in your browser without needing a wallet, private keys, or testnet NEAR.
+
+---
+
+### Option 2: Try it in 10 seconds (Offline Simulator)
 
 No wallet, no testnet keys, and no LLM API key required - just Node.js ≥ 20:
 
@@ -58,7 +72,7 @@ The simulator reads 6 sample invoices and reconciles them against each business'
 
 ---
 
-### Option 2: Run it live on NEAR Testnet (UI & Agent)
+### Option 3: Run it live on NEAR Testnet (UI & Agent)
 
 Want to see real transactions hit the blockchain and click through the web dashboard?
 
@@ -94,9 +108,9 @@ This automatically creates four testnet accounts (`alpha`, `bravo`, `charlie`, a
 ```bash
 npm run dev
 ```
-The landing page opens at [http://127.0.0.1:5173](http://127.0.0.1:5173). Its **Open the dashboard** button (or [http://127.0.0.1:5173/dashboard](http://127.0.0.1:5173/dashboard) directly) leads to the dashboard, where you run the agent, sign as each business, clear the loop and pay the leftovers.
+The landing page opens at [http://127.0.0.1:5173](http://127.0.0.1:5173) (or live at [deloop-three.vercel.app](https://deloop-three.vercel.app/)). Its **Open the dashboard** button (or [http://127.0.0.1:5173/dashboard](http://127.0.0.1:5173/dashboard) / [deloop-three.vercel.app/dashboard](https://deloop-three.vercel.app/dashboard)) leads to the dashboard, where you run the agent, sign as each business, clear the loop and pay the leftovers.
 
-**No keys or testnet NEAR? Use replay mode.** When the local API is not running (or with [`/dashboard?mode=replay`](http://127.0.0.1:5173/dashboard?mode=replay)), the dashboard replays the four steps in the browser. It uses the agent's real results on the sample invoices and the contract's own rules: only the debtor confirms or pays, and the loop worth the most clears first. No transaction is sent. Each step that matches the recorded 9 November testnet run links to that real transaction, and **Start over** resets it. `npm run replay:data` rebuilds the replay data from `samples/` and `deployments/testnet.json`.
+**No keys or testnet NEAR? Use replay mode.** When the local API is not running (or with [`/dashboard?mode=replay`](https://deloop-three.vercel.app/dashboard?mode=replay)), the dashboard replays the four steps in the browser. It uses the agent's real results on the sample invoices and the contract's own rules: only the debtor confirms or pays, and the loop worth the most clears first. No transaction is sent. Each step that matches the recorded 9 November testnet run links to that real transaction, and **Start over** resets it. `npm run replay:data` rebuilds the replay data from `samples/` and `deployments/testnet.json`.
 
 > **How demo keys are handled:**
 > `npm run setup` generates keys for the four demo businesses into the local `.keys/` directory (which is gitignored). Our local dev server (listening strictly on `127.0.0.1`) signs transactions on behalf of whichever business you select in the web UI. This makes testing and reviewing the demo seamless. In production, each business connects and signs with its own NEAR wallet - the Deloop agent never holds private keys.
@@ -200,6 +214,8 @@ These links and transaction hashes come from a real testnet run executed on **20
 
 | Step | Account / Transaction | Link |
 |---|---|---|
+| Live Web App | Production Vercel deployment | [deloop-three.vercel.app](https://deloop-three.vercel.app/) |
+| Interactive Replay | Zero-setup 4-step walk-through | [deloop-three.vercel.app/dashboard?mode=replay](https://deloop-three.vercel.app/dashboard?mode=replay) |
 | Contract | `deloop.0xforge.testnet` | [View on NearBlocks](https://testnet.nearblocks.io/address/deloop.0xforge.testnet) |
 | Businesses | `alpha`, `bravo`, `charlie`, `delta` `.0xforge.testnet` | [`alpha`](https://testnet.nearblocks.io/address/alpha.0xforge.testnet) · [`bravo`](https://testnet.nearblocks.io/address/bravo.0xforge.testnet) · [`charlie`](https://testnet.nearblocks.io/address/charlie.0xforge.testnet) · [`delta`](https://testnet.nearblocks.io/address/delta.0xforge.testnet) |
 | Deploy contract | `AADott2aPwUS5JCea3fYSXqabKdQXpdLM5RCvcZLajHE` | [View transaction](https://testnet.nearblocks.io/txns/AADott2aPwUS5JCea3fYSXqabKdQXpdLM5RCvcZLajHE) |
