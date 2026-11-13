@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { chain, flaggedSamples, live, liveAvailable, replay, type AgentRun, type Backend, type Cleared, type State } from "./backend";
 
 /** The four demo businesses. On testnet they are alpha, bravo, charlie and delta under the master account. */
@@ -490,6 +491,7 @@ export function App() {
           <p>Testnet demo. The local API signs as the business you pick; in production each business signs with its own wallet.</p>
         </div>
       </footer>
+      <Analytics />
     </>
   );
 }
